@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.RoleMenuMapper">
+
+    <!--void insertRoleMenu(@Param("roleId") String id, List<Integer> menuIdList);-->
+    <insert id="insertRoleMenu">
+        insert into b_role_menu(role_id,menu_id) values
+        <foreach collection="menuIdList" item="menuId" separator=",">
+            (#{roleId},#{menuId})
+        </foreach>
+    </insert>
+
+    <!--void deleteRoleMenuByRoleId(@Param("roleId") String id);-->
+    <delete id="deleteRoleMenuByRoleId">
+        DELETE
+        FROM b_role_menu
+        WHERE role_id = #{roleId}
+    </delete>
+
+    <!--void deleteRoleMenu(List<String> roleIdList);-->
+    <delete id="deleteRoleMenu">
+        DELETE
+        FROM b_role_menu
+        WHERE role_id IN
+        <foreach collection="roleIdList" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+     </delete>
+</mapper>

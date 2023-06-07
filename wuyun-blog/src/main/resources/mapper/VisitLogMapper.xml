@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.VisitLogMapper">
+
+    <delete id="deleteVisitLog">
+        DELETE
+        FROM b_visit_log
+        WHERE create_time &lt;= #{endTime}
+    </delete>
+
+    <select id="selectUserViewList" resultType="com.wuyun.model.vo.UserViewVO">
+        SELECT count(distinct ip_address) as uv,
+               count(create_time) as pv,
+               DATE_FORMAT(create_time, '%Y-%m-%d') as `date`
+        FROM b_visit_log
+        WHERE create_time &gt; #{startTime}
+          AND create_time &lt;= #{endTime}
+        group by DATE_FORMAT(create_time, '%Y-%m-%d')
+    </select>
+
+    <select id="selectVisitLogList" resultType="com.wuyun.entity.VisitLog">
+        SELECT bvl.id,
+               page,
+               ip_address,
+               ip_source,
+               os,
+               browser,
+               create_time
+        FROM ( SELECT id FROM b_visit_log
+                <where>
+                    <if test="keyword != null and keyword != ''">
+                        page like concat('%',#{keyword},'%')
+                    </if>
+                </where>
+                ORDER BY id DESC
+                LIMIT #{limit},#{size}
+             ) temp
+        LEFT JOIN b_visit_log bvl ON temp.id = bvl.id
+    </select>
+</mapper>

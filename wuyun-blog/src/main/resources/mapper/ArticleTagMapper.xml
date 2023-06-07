@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.ArticleTagMapper">
+
+    <insert id="saveBatchArticleTag">
+        INSERT INTO b_article_tag(article_id,tag_id) VALUES
+        <foreach collection="tagIdList" item="tagId" separator=",">
+            (#{articleId},#{tagId})
+        </foreach>
+    </insert>
+</mapper>

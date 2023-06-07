@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.MessageMapper">
+
+    <select id="selectMessageBackVOList" resultType="com.wuyun.model.vo.MessageBackVO">
+        SELECT m.id,
+               nickname,
+               avatar,
+               message_content,
+               ip_address,
+               ip_source,
+               is_check,
+               create_time
+        FROM (SELECT id
+              FROM b_message
+                <where>
+                    <if test="condition.keyword != null and condition.keyword != ''">
+                        nickname like concat('%',#{condition.keyword},'%')
+                    </if>
+                    <if test="condition.isCheck != null">
+                        is_check = #{condition.isCheck}
+                    </if>
+                </where>
+                ORDER BY id DESC
+                LIMIT #{limit},#{size}
+              ) temp
+        LEFT JOIN b_message m ON temp.id = m.id
+    </select>
+
+    <select id="selectMessageVOList" resultType="com.wuyun.model.vo.MessageVO">
+        SELECT id,
+               nickname,
+               avatar,
+               message_content
+        from b_message
+        WHERE is_check = 1
+    </select>
+</mapper>

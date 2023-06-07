@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.TagMapper">
+
+    <!--List<TagBackVO> selectTagBackVO(@Param("limit") Long limit, @Param("size") Long size, @Param("keyword") String keyword);-->
+    <select id="selectTagBackVO" resultType="com.wuyun.model.vo.TagBackVO">
+        SELECT t.id,
+               t.tag_name,
+               COUNT(bat.article_id) as article_count,
+               t.create_time
+        FROM b_tag t LEFT JOIN b_article_tag bat ON t.id = bat.tag_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                tag_name like concat('%', #{keyword}, '%')
+            </if>
+        </where>
+        GROUP BY t.id
+        limit #{limit},#{size}
+    </select>
+
+    <!--List<Tag> selectTagList(List<String> tagNameList);-->
+    <select id="selectTagList" resultType="com.wuyun.entity.Tag">
+        SELECT id, tag_name
+        FROM b_tag
+        WHERE tag_name IN
+        <foreach collection="tagNameList" item="tagName" open="(" separator="," close=")">
+            #{tagName}
+        </foreach>
+    </select>
+    <select id="selectTagNameByArticleId" resultType="java.lang.String">
+        SELECT tag_name
+        FROM b_tag t INNER JOIN b_article_tag bat ON t.id = bat.tag_id
+        WHERE article_id = #{articleId}
+    </select>
+
+    <select id="selectTagOptionList" resultType="com.wuyun.model.vo.TagOptionVO">
+        select id,
+               tag_name
+        from b_tag
+    </select>
+
+    <select id="selectTagVOList" resultType="com.wuyun.model.vo.TagVO">
+        SELECT t.id,
+               t.tag_name,
+               COUNT(bat.tag_id) AS article_count
+        FROM b_tag t LEFT JOIN b_article_tag bat ON t.id = bat.tag_id
+        GROUP BY t.id
+    </select>
+
+
+</mapper>

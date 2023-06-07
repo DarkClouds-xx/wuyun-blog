@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.MenuMapper">
+
+    <!--List<UserMenuVO> selectMenuByUserId(@Param("userId") Integer userId);-->
+    <select id="selectMenuByUserId" resultType="com.wuyun.model.vo.UserMenuVO">
+        SELECT DISTINCT m.id,
+                        m.parent_id,
+                        m.menu_name,
+                        m.menu_type,
+                        m.path,
+                        m.icon,
+                        m.order_num,
+                        m.component,
+                        m.is_hidden
+        FROM b_menu m INNER JOIN b_role_menu rm ON m.id = rm.menu_id
+                      INNER JOIN b_user_role ur ON rm.role_id = ur.role_id
+                      INNER JOIN b_role r ON ur.role_id = r.id
+        WHERE m.menu_type IN ('M', 'C')
+        AND m.is_disable = 0
+        AND r.is_disable = 0
+        AND ur.user_id = #{userId}
+        ORDER BY m.parent_id, m.order_num
+    </select>
+
+    <!--List<String> selectPermissionByRoleId(@Param("roleId") String roleId);-->
+    <select id="selectPermissionByRoleId" resultType="java.lang.String">
+        SELECT DISTINCT m.perms
+        FROM b_menu m INNER JOIN b_role_menu rm ON m.id = rm.menu_id
+        WHERE rm.role_id = #{roleId}
+        AND m.is_disable = 0
+    </select>
+
+    <!--List<MenuVO> selectMenuVOList(@Param("condition") ConditionDTO condition);-->
+    <select id="selectMenuVOList" resultType="com.wuyun.model.vo.MenuVO">
+        SELECT id,
+               parent_id,
+               menu_type,
+               menu_name,
+               path,
+               icon,
+               component,
+               perms,
+               is_hidden,
+               is_disable,
+               order_num,
+               create_time
+        FROM b_menu
+        <where>
+            <if test="condition.keyword != null and condition.keyword != ''">
+                and menu_name like concat('%',#{condition.keyword},'%')
+            </if>
+            <if test="condition.isDisable != null">
+                and is_disable = #{condition.isDisable}
+            </if>
+        </where>
+        order by order_num
+    </select>
+
+    <!-- List<MenuTree> selectMenuTree();-->
+    <select id="selectMenuTree" resultType="com.wuyun.model.vo.MenuTree">
+        SELECT id,
+               parent_id,
+               menu_name AS label
+        FROM b_menu
+        WHERE is_disable = 0
+        ORDER BY order_num
+    </select>
+
+    <!--List<MenuTree> selectMenuOptions();-->
+    <select id="selectMenuOptions" resultType="com.wuyun.model.vo.MenuOption">
+        SELECT id AS `value`,
+               parent_id,
+               menu_name AS label
+        FROM b_menu
+        WHERE is_disable = 0
+        AND menu_type IN ('M', 'C')
+        ORDER BY order_num
+    </select>
+
+    <!--MenuDTO selectMenuById(@Param("menuId") Integer menuId);-->
+    <select id="selectMenuById" resultType="com.wuyun.model.dto.MenuDTO">
+        SELECT id,
+               parent_id,
+               menu_type,
+               menu_name,
+               path,
+               icon,
+               component,
+               perms,
+               is_hidden,
+               is_disable,
+               order_num
+        FROM b_menu
+        WHERE id = #{menuId}
+    </select>
+</mapper>

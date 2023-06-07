@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.CategoryMapper">
+
+    <!--List<CategoryBackVO> selectCategoryBackVO(@Param("limit") Long limit,@Param("size") Long size,@Param("keyword") String keyword);-->
+    <select id="selectCategoryBackVO" resultType="com.wuyun.model.vo.CategoryBackVO">
+        SELECT c.id,
+               category_name,
+               COUNT(a.id) AS article_count,
+               c.create_time
+        FROM b_category c LEFT JOIN b_article a ON c.id = a.category_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                category_name like concat('%', #{keyword}, '%')
+            </if>
+        </where>
+        GROUP BY c.id
+        limit #{limit},#{size}
+    </select>
+
+    <select id="selectCategoryVO" resultType="com.wuyun.model.vo.CategoryVO">
+        SELECT c.id,
+               c.category_name,
+               COUNT(a.id) AS article_count
+        FROM b_category c LEFT JOIN (SELECT id,
+                                            category_id
+                                     FROM b_article
+                                     WHERE is_delete = 0 AND `status` = 1
+                                     ) a ON c.id = a.category_id
+        GROUP BY c.id
+    </select>
+
+</mapper>

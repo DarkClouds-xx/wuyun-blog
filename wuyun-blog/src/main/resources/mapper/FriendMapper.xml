@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.FriendMapper">
+
+    <select id="selectFriendVOList" resultType="com.wuyun.model.vo.FriendVO">
+        SELECT id,
+               `name`,
+               color,
+               url,
+               avatar,
+               introduction
+        FROM b_friend
+    </select>
+
+    <select id="selectFriendBackVOList" resultType="com.wuyun.model.vo.FriendBackVO">
+        SELECT id,
+               `name`,
+               color,
+               avatar,
+               url,
+               introduction,
+               create_time
+        FROM b_friend
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `name` like concat('%',#{keyword},'%')
+            </if>
+        </where>
+        ORDER BY id DESC
+        limit #{limit},#{size}
+    </select>
+</mapper>

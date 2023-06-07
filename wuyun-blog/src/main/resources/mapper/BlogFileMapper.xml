@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.BlogFileMapper">
+
+    <!--List<FileVO> selectFileVOList(Long limit, Long size, String filePath);-->
+    <select id="selectFileVOList" resultType="com.wuyun.model.vo.FileVO">
+        SELECT id,
+               file_url,
+               file_name,
+               file_size,
+               extend_name,
+               file_path,
+               is_dir,
+               create_time
+        FROM b_blog_file
+        <where>
+            <if test="filePath != null and filePath != ''">
+                file_path = #{filePath}
+            </if>
+        </where>
+        limit #{limit}, #{size}
+    </select>
+</mapper>

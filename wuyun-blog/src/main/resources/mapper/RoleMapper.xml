@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wuyun.mapper.RoleMapper">
+    <!--List<String> selectRoleListByUserId(@Param("userId") Object userId);-->
+    <select id="selectRoleListByUserId" resultType="java.lang.String">
+        SELECT r.id
+        FROM b_role r INNER JOIN b_user_role ur ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+        AND r.is_disable = 0
+    </select>
+
+    <!--List<RoleVO> selectRoleVOList(@Param("condition") ConditionDTO condition);-->
+    <select id="selectRoleVOList" resultType="com.wuyun.model.vo.RoleVO">
+        SELECT id,
+               role_name,
+               role_desc,
+               is_disable,
+               create_time
+        FROM b_role
+        <where>
+            <if test="condition.keyword != null and condition.keyword != ''">
+                and role_name like concat('%',#{condition.keyword},'%')
+            </if>
+            <if test="condition.isDisable != null">
+                and is_disable = #{condition.isDisable}
+            </if>
+        </where>
+        ORDER BY id
+        LIMIT #{limit},#{size}
+    </select>
+
+    <!--Long selectCountRoleVO(@Param("condition") ConditionDTO condition);-->
+    <select id="selectCountRoleVO" resultType="java.lang.Long">
+        SELECT COUNT(id)
+        FROM b_role
+        <where>
+            <if test="condition.keyword != null and condition.keyword != ''">
+                and role_name like concat('%',#{condition.keyword},'%')
+            </if>
+            <if test="condition.isDisable != null">
+                and is_disable = #{condition.isDisable}
+            </if>
+        </where>
+    </select>
+
+    <!--List<UserRoleVO> selectUserRoleList();-->
+    <select id="selectUserRoleList" resultType="com.wuyun.model.vo.UserRoleVO">
+        SELECT id,
+               role_name
+        FROM b_role
+    </select>
+
+    <!--List<Integer> listRoleMenuTree(@Param("roleId") String roleId);-->
+    <select id="listRoleMenuTree" resultType="java.lang.Integer">
+        SELECT menu_id
+        FROM b_role_menu
+        WHERE role_id = #{roleId}
+    </select>
+</mapper>
